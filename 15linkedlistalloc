@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_BLOCKS 100
+
+// Structure to represent a block
+struct Block {
+    int block_number;
+    struct Block* next;
+};
+
+// Function to allocate a new block
+struct Block* allocateBlock(int blockNumber) {
+    struct Block* newBlock = (struct Block*)malloc(sizeof(struct Block));
+    if (newBlock == NULL) {
+        printf("Memory allocation failed.\n");
+        return NULL;
+    }
+    newBlock->block_number = blockNumber;
+    newBlock->next = NULL;
+    return newBlock;
+}
+
+int main() {
+    struct Block* head = NULL;
+    struct Block* current = NULL;
+    int blockNumber;
+    char choice;
+
+    do {
+        // Prompt user for block number
+        printf("Enter block number to allocate: ");
+        scanf("%d", &blockNumber);
+
+        // Allocate block
+        if (head == NULL) {
+            head = allocateBlock(blockNumber);
+            if (head == NULL)
+                return 1; // Exit if memory allocation fails
+            current = head;
+        } else {
+            current->next = allocateBlock(blockNumber);
+            if (current->next == NULL)
+                return 1; // Exit if memory allocation fails
+            current = current->next;
+        }
+
+        // Ask if user wants to allocate more blocks
+        printf("Do you want to allocate another block? (y/n): ");
+        scanf(" %c", &choice); // Note the space before %c to consume newline
+
+    } while (choice == 'y' || choice == 'Y');
+
+    // Display the allocated blocks
+    printf("Allocated blocks: ");
+    current = head;
+    while (current != NULL) {
+        printf("%d ", current->block_number);
+        current = current->next;
+    }
+    printf("\n");
+
+    // Clean up (free memory)
+    current = head;
+    while (current != NULL) {
+        struct Block* temp = current;
+        current = current->next;
+        free(temp);
+    }
+
+    return 0;
+}

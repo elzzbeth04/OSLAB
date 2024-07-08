@@ -1,0 +1,83 @@
+#include <stdio.h>
+
+void main() {
+    int i, j, min, rs[25], m[10], age[10], n, f, pf = 0;
+
+    // Input the length of the reference string
+    printf("Enter the length of reference string -- ");
+    scanf("%d", &n);
+
+    // Input the reference string
+    printf("Enter the reference string -- ");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &rs[i]);
+    }
+
+    // Input the number of frames
+    printf("Enter the number of frames -- ");
+    scanf("%d", &f);
+    for(i = 0; i < f; i++) {
+        m[i] = -1; // Initialize frame to empty
+        age[i] = 0; // Initialize usage counter for each frame
+    }
+
+    // Process the reference string
+    printf("\nThe Page Replacement process is -- \n");
+    for(i = 0; i < n; i++) {
+        int found = 0;
+        int page = rs[i];
+
+        // Check if the page is already in one of the frames
+        for(j = 0; j < f; j++) {
+            if(m[j] == page) {
+                age[j]++; // Increment usage counter if found
+                found = 1;
+                break;
+            }
+        }
+
+        // If the page is not found in frames
+        if(!found) {
+            pf++; // Increment page fault count
+            int flag = 0;
+
+            // Check for an empty frame
+            for(j = 0; j < f; j++) {
+                if(m[j] == -1) {
+                    m[j] = page; // Place page in the empty frame
+                    age[j] = 1; // Initialize usage counter for the new page
+                    flag = 1;
+                    break;
+                }
+            }
+
+            // If no empty frame is found, replace the least frequently used page
+            if(!flag) {
+                min = 0;
+                for(j = 1; j < f; j++) {
+                    if(age[j] < age[min]) {
+                        min = j;
+                    }
+                }
+                m[min] = page; // Replace the page
+                age[min] = 1; // Reset usage counter for the new page
+            }
+        }
+
+        // Print the current state of frames
+        for(j = 0; j < f; j++) {
+            if(m[j] == -1) {
+                printf("-\t");
+            } else {
+                printf("%d\t", m[j]);
+            }
+        }
+        if(!found) {
+            printf("PF No. -- %d", pf);
+        }
+        printf("\n");
+    }
+
+    // Print the total number of page faults
+    printf("\nThe number of page faults using LFU are %d\n", pf);
+}

@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_BLOCKS 100
+
+// Structure to represent an index block
+struct IndexBlock {
+    int data_blocks[MAX_BLOCKS];
+};
+
+// Function to initialize an index block
+void initializeIndexBlock(struct IndexBlock* indexBlock) {
+    for (int i = 0; i < MAX_BLOCKS; ++i) {
+        indexBlock->data_blocks[i] = -1; // Initialize with -1 (invalid block)
+    }
+}
+
+// Function to allocate a data block for a file
+int allocateDataBlock(struct IndexBlock* indexBlock, int blockNumber) {
+    for (int i = 0; i < MAX_BLOCKS; ++i) {
+        if (indexBlock->data_blocks[i] == -1) {
+            indexBlock->data_blocks[i] = blockNumber;
+            return 1; // Successfully allocated
+        }
+    }
+    return 0; // No free space in the index block
+}
+
+// Function to read data from a file
+void readData(struct IndexBlock* indexBlock, int fileBlockNumber) {
+    int flag = 0;
+    for (int i = 0; i < MAX_BLOCKS; i++) {
+        if (indexBlock->data_blocks[i] != -1 && fileBlockNumber == indexBlock->data_blocks[i]) {
+            printf("Reading data from block %d\n", indexBlock->data_blocks[i]);
+            flag = 1;
+        }
+    }
+
+    if (flag == 0) {
+        printf("Block %d is not allocated.\n", fileBlockNumber);
+    }
+}
+
+int main() {
+    struct IndexBlock indexBlock;
+    initializeIndexBlock(&indexBlock);
+
+    int choice, blockNumber;
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Allocate Data Block\n");
+        printf("2. Read Data Block\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter block number to allocate: ");
+                scanf("%d", &blockNumber);
+                if (allocateDataBlock(&indexBlock, blockNumber)) {
+                    printf("Block %d allocated successfully.\n", blockNumber);
+                } else {
+                    printf("Failed to allocate block %d. No free space in the index block.\n", blockNumber);
+                }
+                break;
+
+            case 2:
+                printf("Enter block number to read: ");
+                scanf("%d", &blockNumber);
+                readData(&indexBlock, blockNumber);
+                break;
+
+            case 3:
+                exit(0);
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
